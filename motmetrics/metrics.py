@@ -253,8 +253,14 @@ def num_predictions(df):
     return df.noraw.HId.count()
 
 def track_ratios(df, obj_frequencies):
-    """Ratio of assigned to total appearance count per unique object id."""   
+    """Ratio of assigned to total appearance count per unique object id."""
+    #print(df.shape)
+    #print(df.noraw[df.noraw.Type != 'MISS'].shape)
+    print('Mani: Tracking check')
+    print(type(df.noraw[df.noraw.Type != 'MISS']['OId']))
     tracked = df.noraw[df.noraw.Type != 'MISS']['OId'].value_counts()
+    print('Mani: tracked = {}'.format(tracked))
+    print('Mani: tracked.div(obj_frequencies) = {}'.format(tracked.div(obj_frequencies).fillna(0.)))
     return tracked.div(obj_frequencies).fillna(0.)
 
 def mostly_tracked(df, track_ratios):
@@ -271,11 +277,15 @@ def mostly_lost(df, track_ratios):
 
 def num_fragmentations(df, obj_frequencies):
     """Total number of switches from tracked to not tracked."""
+    print('Mani: fragmentations: type(obj_frequencies) = {}'.format(type(obj_frequencies)))
+    print('Mani: fragmentations: obj_frequencies.index = {}'.format(obj_frequencies.index))
+    print('Mani: fragmentations: len(obj_frequencies.index) = {}'.format(len(obj_frequencies.index)))
     fra = 0
     for o in obj_frequencies.index:
         # Find first and last time object was not missed (track span). Then count
         # the number switches from NOT MISS to MISS state.
         dfo = df.noraw[df.noraw.OId == o]
+        #print('Mani: fragmentation : idx, shape = {}, {}'.format(o,dfo.shape))
         notmiss = dfo[dfo.Type != 'MISS']
         if len(notmiss) == 0:
             continue
@@ -287,10 +297,16 @@ def num_fragmentations(df, obj_frequencies):
 
 def motp(df, num_detections):
     """Multiple object tracker precision."""
+    print('Mani MOTP: numerator = {}'.format(df.noraw['D'].sum()))
+    print('Mani MOTP: denominator(correct object-hypothesis pairs) = {}'.format(num_detections))
     return df.noraw['D'].sum() / num_detections
 
 def mota(df, num_misses, num_switches, num_false_positives, num_objects):
     """Multiple object tracker accuracy."""
+    print('Mani MOTA: FN = {}'.format(num_misses))
+    print('Mani MOTA: FP = {}'.format(num_false_positives))
+    print('Mani MOTA: switches = {}'.format(num_switches))
+    print('Mani MOTA: total_num_objects_in_all_frames = {}'.format(num_objects))
     return 1. - (num_misses + num_switches + num_false_positives) / num_objects
 
 def precision(df, num_detections, num_false_positives):

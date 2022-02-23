@@ -167,6 +167,7 @@ def init_standard_solvers():
         warnings.warn('No standard LAP solvers found. Consider `pip install lapsolver` or `pip install scipy`', category=RuntimeWarning)
     else:
         default_solver = available_solvers[0]
+        print('Mani:default lap solver = {}'.format(default_solver))
 
 init_standard_solvers()
 
